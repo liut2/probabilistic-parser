@@ -1,3 +1,8 @@
+#count.py
+#written by Tao Liu
+#the training data is in single-line json format, not the original treebank
+#I select the training set format like this because it makes it easier to get the 
+#the grammar from the parsed sentences compared to treebank
 import sys
 import json
 import string
@@ -104,8 +109,11 @@ class Counter:
 			string = "non-terminal" + " " + lefthand + " " + str(count) +  " \n"
 			f.write(string)
 		f.close()
+	#this function deals with the unknown words
 	def unknownProb(self):
 		totalCount = 0
+		#calculate the distribution of non-terminals and assign proper weight to 
+		#unknown words unary rule probabilities
 		for key, value in self.nonterminalCount.items():
 			totalCount += value
 		for key, value in self.nonterminalCount.items():
