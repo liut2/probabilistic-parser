@@ -3,7 +3,30 @@
 import sys
 import string
 import operator
+import json
+import pprint
+#use the Node class to help us print the tree later
+class Node:
+	def __init__(self, name):
+		self.name = name
 
+	def __repr__(self):
+		return self.name
+#reconstruct the json-formatted tree to make it print out in a hierarchy
+#With some referrence to python pprint docs
+class Format:
+	def formatTree(self, tree):
+		tree[0] = Node(tree[0])
+		if (len(tree) == 2):
+			tree[1] = Node(tree[1])
+		elif (len(tree) == 3):
+			self.formatTree(tree[1])
+			self.formatTree(tree[2])
+
+	def printTree(self, tree):
+
+		self.formatTree(tree)
+		print(pprint.pformat(tree))
 #this class reads the probabilities we calculated and use the CKY algorithm 
 #along with the probabilities to calculate the most probable parse tree, I also print the 
 #the parse tree in json format
@@ -14,19 +37,21 @@ class Parser:
 		self.unaryProb = unaryProb
 		self.nonterminalCount = nonterminalCount
 	def test(self, number, testFile):
+		formatTr = Format()
 		f = open(testFile)
 		count = 0
 		for line in f:
 			if count < int(number):
 				print(line)
 				print("")
-				self.CKY(line)
+				words, table, back = self.CKY(line)
+				formatTr.printTree(self.constructTree(words, table, back))
 				print("")
 				count += 1
 			else:
 				break
-
 		f.close()
+		
 	#this function recursively prints the tree.
 	#since the tree satisfies the binarization, it's very easy to 
 	#use the divide and conquer to parse the tree
@@ -38,7 +63,12 @@ class Parser:
 		else:
 			(k, righthand1, righthand2) = back[i, j, lefthand]
 			return [lefthand, self.printTree(words, back, i, k, righthand1), self.printTree(words, back, k + 1, j, righthand2)]
-
+	#this function aims to check whether we can construct the tree from the parsing result
+	def constructTree(self, words, table, back):
+		if (0, len(words) - 1, "S") in table:
+			return self.printTree(words, back, 0, len(words) - 1, "S")
+		else:
+			print("there is no parse tree that can be generated from the grammar rule")
 
 	#this is the revised version of the CKY with the probabilities
 	def CKY(self, words):
@@ -61,18 +91,16 @@ class Parser:
 			if ifUnknown:
 				for lefthand in self.nonterminalCount.keys():
 					table[i, i, lefthand] = self.unaryProb[lefthand, "UNKNOWN"]
-			#outter loop
-			for split in range(1, n):
-				for i in range(n - split):
-					j = i + split
+			#for loops, with some referrence to Minghui Chen's implementation, https://github.com/jhsrcmh/PCFG/
+			for span in range(1, n):
+				for i in range(n - span):
+					j = i + span
 					for lefthand in self.nonterminalCount.keys():
 						maxProb = 0
-						backInfo = None
-						for lh in self.binaryProb.keys():
-							if lh[0] == lefthand:
-								#forall{A|A → BC ∈ grammar,and table[i,k,B] > 0 and table[k, j,C] > 0 }
-								righthand1, righthand2 = lh[1], lh[2]
-								
+						backInfo = ""
+						for (lh, righthand1, righthand2) in self.binaryProb:
+							if lh == lefthand:
+								#forall{A|A → BC ∈ grammar,and table[i,k,B] > 0 and table[k, j,C] > 0 }		
 								for k in range(i,j):
 									if (i, k, righthand1) in table and (k+1, j, righthand2) in table:
 										#f (table[i,j,A] < P(A → BC) × table[i,k,B] × table[k,j,C]) then
@@ -87,10 +115,7 @@ class Parser:
 							table[i, j, lefthand] = maxProb
 							back[i, j, lefthand] = backInfo
 		
-		if (0, len(words) - 1, "S") in table:
-			print(self.printTree(words, back, 0, len(words) - 1, "S"))
-		else:
-			print("there is no parse tree that can be generated from the grammar rule")
+		return words, table, back
 
 #this class read probabilites we calculated before from the text file
 class ProbBuilder:
@@ -136,5 +161,7 @@ if __name__ == "__main__":
   testFile = sys.argv[2]
   numberOfLines = sys.argv[3]
   parser.test(numberOfLines, testFile)
-  #parser.CKY("the man saw the dog with the telescope")
-  
+  #test
+  #result = parser.CKY("Traders can vary their strategies and execute their orders in any one of them")
+  #form = Format()
+  #form.printTree(result)

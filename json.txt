@@ -1,0 +1,1 @@
+["S", ["NP", ["DET", "the"], ["NP", ["NOUN", "ways"], ["NP", ["CONJ", "and"], ["NP", ["NOUN", "means"], ["NOUN", "committee"]]]]], ["VP", ["VERB", "will"], ["VP", ["VERB", "hold"], ["NP", ["NP", ["DET", "a"], ["NOUN", "hearing"]], ["PP", ["ADP", "on"], ["NP", ["DET", "the"], ["NP", ["NOUN", "bill"], ["NP", ["ADJ", "next"], ["NOUN", "tuesday"]]]]]]]]]

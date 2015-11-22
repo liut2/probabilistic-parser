@@ -41,7 +41,10 @@ class Counter:
 		for (lefthand, terminal), count in self.unaryCount.items():
 			self.unaryProb[lefthand, terminal] = float(count)/ self.nonterminalCount[lefthand]
 		for (lefthand, righthand1, righthand2), count in self.binaryCount.items():
-			self.binaryProb[lefthand, righthand1, righthand2] = float(count)/self.nonterminalCount[lefthand]
+			if lefthand == "S" and (righthand1 == "S" or righthand2 == "S"):
+				continue
+			else:
+				self.binaryProb[lefthand, righthand1, righthand2] = float(count)/self.nonterminalCount[lefthand]
 		for (lefthand, righthand1, righthand2), count in self.binaryProb.items():
 			if (lefthand == "S"):
 				string = lefthand + " -> " + righthand1 + " " + righthand2 + " " + str(count)
