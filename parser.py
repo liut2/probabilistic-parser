@@ -13,6 +13,20 @@ class Parser:
 		self.binaryProb = binaryProb
 		self.unaryProb = unaryProb
 		self.nonterminalCount = nonterminalCount
+	def test(self, number, testFile):
+		f = open(testFile)
+		count = 0
+		for line in f:
+			if count < int(number):
+				print(line)
+				print("")
+				self.CKY(line)
+				print("")
+				count += 1
+			else:
+				break
+
+		f.close()
 	#this function recursively prints the tree.
 	#since the tree satisfies the binarization, it's very easy to 
 	#use the divide and conquer to parse the tree
@@ -29,7 +43,7 @@ class Parser:
 	#this is the revised version of the CKY with the probabilities
 	def CKY(self, words):
 		#split the sentence
-		words = words.strip().split(" ")
+		words = words.strip().lower().split(" ")
 		n = len(words)
 		#init the table and the backpointer
 		table = {}
@@ -119,5 +133,8 @@ if __name__ == "__main__":
   probBuilder = ProbBuilder()
   binaryProb, unaryProb, nonterminalCount = probBuilder.readCount(fileName)
   parser = Parser(binaryProb, unaryProb, nonterminalCount)
-  parser.CKY("the man saw the dog with the telescope")
+  testFile = sys.argv[2]
+  numberOfLines = sys.argv[3]
+  parser.test(numberOfLines, testFile)
+  #parser.CKY("the man saw the dog with the telescope")
   

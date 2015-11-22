@@ -42,7 +42,10 @@ class Counter:
 			self.unaryProb[lefthand, terminal] = float(count)/ self.nonterminalCount[lefthand]
 		for (lefthand, righthand1, righthand2), count in self.binaryCount.items():
 			self.binaryProb[lefthand, righthand1, righthand2] = float(count)/self.nonterminalCount[lefthand]
-		
+		for (lefthand, righthand1, righthand2), count in self.binaryProb.items():
+			if (lefthand == "S"):
+				string = lefthand + " -> " + righthand1 + " " + righthand2 + " " + str(count)
+				print(string)
 	#read the tree as json format and output the result to count.txt
 	def count(self, fileName):
 		f = open(fileName)
